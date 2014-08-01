@@ -1,6 +1,6 @@
 
                                  DBStat
-![Image text](http://gitlab.corp.ncfgroup.com/javateam/dbstat/raw/master/logo.gif)
+![Image text](https://github.com/ganqiang1983/dbstat/blob/master/logo.gif)
 
   What is it? <br />
   DBStat is a data statistics (or migration) tool. 
