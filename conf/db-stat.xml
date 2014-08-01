@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db-stat>
+  <timer>
+    <!-- 日报 -->
+    <instance id="t1">
+    	<interval>24*60*60*1000</interval>
+    	<starttime>2014-04-26 17:05:00</starttime>                                                                                                                                                                                                                           
+    </instance>
+  </timer> 
+<reader>
+    <datasource>
+       <driverclassname>com.mysql.jdbc.Driver</driverclassname>
+       <url>jdbc:mysql://localhost:3306/p2p?useUnicode=true&amp;characterEncoding=UTF-8</url>
+       <username>root</username>
+       <password>root</password>
+       <initpoolsize>10</initpoolsize>
+    </datasource>
+    <select>
+       <sql id="1" tid="t1">
+         <value>
+      	    select m.platform,m.money,c.np from
+	           (select aaa.platform,sum(aaa.money) as money from
+	           ((select aa.platform,sum(aa.money) as money from
+	           ((select t.platform,sum(y.remain_money - t.remain_money) as money from
+	           (select * from day_project as d1 where d1.create_time like '2014-04-23%' ) as t,
+	           (select * from day_project as d2 where d2.create_time like '2014-04-22%') as y
+	           where t.url=y.url group by t.platform)
+	           union all
+	           (select t.platform,sum(t.money - t.remain_money) as money from day_project as t where t.create_time like '2014-04-23%' and t.progress!='0'
+	           and t.url not in (select url from day_project where create_time like '2014-04-22%') group by platform)
+	           ) as aa group by aa.platform)
+	           union all
+	           (select distinct(platform) as platform,0 as money from project)) as aaa
+	           group by aaa.platform) as m
+	           left join
+	           (select ccc.platform,sum(ccc.np) as np from
+	           (select t.platform,count(t.url) as np from day_project as t where t.create_time like '2014-04-23%'
+	           and t.url not in (select url from day_project where create_time like '2014-04-22%')
+	           group by t.platform
+	           union all
+	           select distinct(platform) as platform,0 as np from project) as ccc group by ccc.platform) as c
+	           on m.platform=c.platform
+		 </value> 
+       </sql>
+      </select>
+  </reader>
+  <writer>
+    <datasource>
+       <driverclassname>com.mysql.jdbc.Driver</driverclassname>
+       <url>jdbc:mysql://localhost:3306/p2p?useUnicode=true&amp;characterEncoding=GBK</url>
+       <username>root</username>
+       <password>root</password>
+       <initpoolsize>10</initpoolsize>
+    </datasource>
+    <insert>
+      <sql refid="1">
+        <value>
+        insert into day_site_stat(id,platform,stat_time,current_year,month_of_year,week_of_year,inc_project,inc_money) values ('#{uuid}', '${platform}', '#{today}','#{year}','#{monthofyear}', '#{weekofyear}', '${np}', '${money}')
+        </value>
+      </sql>
+    </insert>
+  </writer>
+</db-stat>

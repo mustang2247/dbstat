@@ -1,0 +1,83 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="db-stat" type="dbstattype" />
+	<xs:complexType name="dbstattype">
+		<xs:sequence>
+		    <xs:element name="timer" type="instancetype" />
+			<xs:element name="reader" type="readertype" />
+			<xs:element name="writer" type="writertype" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="datasourceType">
+	  <xs:all>
+        <xs:element name="driverclassname" type="xs:string" />
+        <xs:element name="url" type="xs:string" />
+        <xs:element name="username" type="xs:string" />
+        <xs:element name="password" type="xs:string"/>
+        <xs:element name="initpoolsize" type="xs:decimal" minOccurs="0"/>
+      </xs:all>
+	</xs:complexType>
+	
+	<xs:complexType name="instancetype">
+	  <xs:sequence>
+        <xs:element name="instance" minOccurs="1" maxOccurs="unbounded">
+           <xs:complexType>
+		     <xs:all>
+		       <xs:element name="interval" type="xs:string" minOccurs="0"/>
+	           <xs:element name="starttime" type="xs:string" minOccurs="1"/>
+		     </xs:all>
+		     <xs:attribute name="id" type="xs:string" use="required" />
+	       </xs:complexType>
+        </xs:element>
+	  </xs:sequence>
+	</xs:complexType>
+	
+	
+	
+	<xs:complexType name="readertype">
+	  <xs:sequence>
+	    <xs:element name="datasource" type="datasourceType"/>
+	    <xs:element name="select" type="selecttype"/>
+	  </xs:sequence>
+	</xs:complexType>
+	
+
+	<xs:complexType name="selecttype" >
+	  <xs:sequence>
+	    <xs:element name="sql" minOccurs="1" maxOccurs="unbounded">
+	      <xs:complexType>
+		    <xs:choice>
+		      <xs:element name="value" type="xs:string" />
+		      <xs:element name="class" type="xs:string" />
+	        </xs:choice>
+	        <xs:attribute name="id" type="xs:string" use="required" />
+	        <xs:attribute name="tid" type="xs:string" use="required" />
+	      </xs:complexType>
+	    </xs:element>
+	  </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="writertype">
+	  <xs:all minOccurs="0" >
+	    <xs:element name="datasource" type="datasourceType"/>
+	    <xs:element name="insert" type="wirtersqltype" minOccurs="0" maxOccurs="1"/>
+	    <xs:element name="update" type="wirtersqltype" minOccurs="0" maxOccurs="1"/>
+	    <xs:element name="delete" type="wirtersqltype" minOccurs="0" maxOccurs="1"/>
+	  </xs:all>
+	</xs:complexType>
+	
+	
+	<xs:complexType name="wirtersqltype" >
+	  <xs:sequence>
+	    <xs:element name="sql" minOccurs="1" maxOccurs="unbounded">
+	      <xs:complexType>
+		    <xs:choice>
+		      <xs:element name="value" type="xs:string" />
+		      <xs:element name="class" type="xs:string" />
+	        </xs:choice>
+	        <xs:attribute name="refid" type="xs:string" use="required" />
+	      </xs:complexType>
+	    </xs:element>
+	  </xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>
